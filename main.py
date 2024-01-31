@@ -1,8 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
-from typing import Union, List
 from datetime import datetime
-from database import get_books_from_db, get_random_verse, get_chapters_from_db
+from database import get_books_from_db, get_chapters_by_book_from_db, get_random_verse, get_chapters_from_db, get_verses_by_book_from_db, get_verses_by_chapter_from_db, search_verses_from_db
 
 # Global variables to store the current "Verse of the Day" and its date
 current_verse_of_the_day = None
@@ -15,6 +14,7 @@ async def read_root():
     return RedirectResponse('/docs')
 
 
+# Verse of the Day function
 @app.get("/bible/verses/day")
 async def verse_of_the_day():
     global current_verse_of_the_day
@@ -42,6 +42,7 @@ async def verse_of_the_day():
     return current_verse_of_the_day
 
 
+# Random Verse function
 @app.get("/bible/verses/random")
 async def random_verse():
     random_verse = get_random_verse()
@@ -60,6 +61,7 @@ async def random_verse():
     return verse
 
 
+# Get Books
 @app.get("/bible/books")
 async def get_books():
     books = get_books_from_db()
@@ -71,6 +73,7 @@ async def get_books():
     return books
 
 
+# Get Chapters
 @app.get("/bible/chapters")
 async def get_chapters():
     chapters = get_chapters_from_db()
@@ -80,3 +83,51 @@ async def get_chapters():
         raise HTTPException(status_code=404, detail="chapters not found")
     
     return chapters
+
+
+# Get Verses by Book
+@app.get("/bible/books/{book_id}/verses")
+async def get_verses_by_book(book_id:int):
+    verses = get_verses_by_book_from_db(book_id)
+
+    # Check if verses were found
+    if not verses:
+        raise HTTPException(status_code=404, detail="chapters not found")
+    
+    return verses
+
+
+# Get chapters by Book
+@app.get("/bible/books/{book_id}/chapters")
+async def get_chapters_by_book(book_id:int):
+    chapters = get_chapters_by_book_from_db(book_id)
+
+    # Check if chapters were found
+    if not chapters:
+        raise HTTPException(status_code=404, detail="chapters not found")
+    
+    return chapters
+
+
+# Get Verse by Chapter
+@app.get("/bible/books/{cnumber}/verses")
+async def get_verse_by_chapter(cnumber:int):
+    verses = get_verses_by_chapter_from_db(cnumber)
+
+    # Check if verses were found
+    if not verses:
+        raise HTTPException(status_code=404, detail="chapters not found")
+    
+    return verses
+
+
+# Get Verse by Chapter
+@app.get("/bible/verses/search")
+async def search_verses(query: str):
+    verses = search_verses_from_db(query)
+
+    # Check if verses were found
+    if not verses:
+        raise HTTPException(status_code=404, detail="Verses not found")
+
+    return verses
