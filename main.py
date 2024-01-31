@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from datetime import datetime
-from database import get_books_from_db, get_chapters_by_book_from_db, get_random_verse, get_chapters_from_db, get_verses_by_book_from_db, get_verses_by_chapter_from_db, search_verses_from_db
+from database import get_books_from_db, get_chapters_by_book_from_db, get_random_verse, get_chapters_from_db, get_verse_by_reference_from_db, get_verse_from_db, get_verses_by_book_from_db, get_verses_by_chapter_from_db, get_verses_from_db, search_verses_from_db
 
 # Global variables to store the current "Verse of the Day" and its date
 current_verse_of_the_day = None
@@ -125,6 +125,53 @@ async def get_verse_by_chapter(cnumber:int):
 @app.get("/bible/verses/search")
 async def search_verses(query: str):
     verses = search_verses_from_db(query)
+
+    # Check if verses were found
+    if not verses:
+        raise HTTPException(status_code=404, detail="Verses not found")
+
+    return verses
+
+
+# Get Verse by Reference:
+@app.get("/bible/verses/reference")
+async def get_verse_by_reference(reference: str):
+    verse = get_verse_by_reference_from_db(reference)
+
+    # Check if verse were found
+    if not verse:
+        raise HTTPException(status_code=404, detail="Verses not found")
+
+    return verse
+
+
+
+#Get Next Verse:
+@app.get("/bible/verse/next")
+async def get_next_verse(id: int):
+    verse = get_verse_from_db(id + 1)
+
+    # Check if verse were found
+    if not verse:
+        raise HTTPException(status_code=404, detail="Verses not found")
+
+    return verse
+
+#Get Previous Verse:
+@app.get("/bible/verse/previous")
+async def get_previous_verse(id: int):
+    verse = get_verse_from_db(id - 1)
+
+    # Check if verse were found
+    if not verse:
+        raise HTTPException(status_code=404, detail="Verses not found")
+
+    return verse
+
+#Get Verses:
+@app.get("/bible/verses")
+async def get_verses():
+    verses = get_verses_from_db()
 
     # Check if verses were found
     if not verses:
