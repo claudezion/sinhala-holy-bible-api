@@ -121,7 +121,7 @@ async def get_verse_by_chapter(cnumber:int):
     return verses
 
 
-# Get Verse by Chapter
+# Search Verses
 @app.get("/bible/verses/search")
 async def search_verses(query: str):
     verses = search_verses_from_db(query)
